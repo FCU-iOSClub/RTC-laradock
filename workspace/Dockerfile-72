@@ -704,9 +704,6 @@ RUN php -v | head -n 1 | grep -q "PHP 7.2."
 #--------------------------------------------------------------------------
 #
 RUN apt-get -y install openssl
-RUN openssl genrsa -out "/var/www/laradock/nginx/ssl/laradock.key" 2048 \
-    && openssl req -new -key "/var/www/laradock/nginx/ssl/laradock.key" -out "/var/www/laradock/nginx/ssl/laradock.csr" -subj "/CN=laradock/O=laradock/C=UK" \
-    && openssl x509 -req -days 365 -in "/var/www/laradock/nginx/ssl/laradock.csr" -signkey "/var/www/laradock/nginx/ssl/laradock.key" -out "/var/www/laradock/nginx/ssl/laradock.crt"
 # Clean up
 USER root
 RUN apt-get clean && \
@@ -714,3 +711,5 @@ RUN apt-get clean && \
 
 # Set default work directory
 WORKDIR /var/www
+
+CMD openssl genrsa -out "/var/www/laradock/nginx/ssl/laradock.key" 2048 && openssl req -new -key "/var/www/laradock/nginx/ssl/laradock.key" -out "/var/www/laradock/nginx/ssl/laradock.csr" -subj "/CN=laradock/O=laradock/C=UK" && openssl x509 -req -days 365 -in "/var/www/laradock/nginx/ssl/laradock.csr" -signkey "/var/www/laradock/nginx/ssl/laradock.key" -out "/var/www/laradock/nginx/ssl/laradock.crt" && /sbin/my_init
