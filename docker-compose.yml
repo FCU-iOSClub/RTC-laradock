@@ -545,12 +545,14 @@ services:
     certbot:
       build:
         context: ./certbot
+      volumes_from:
+        - applications
       volumes:
-        - ./data/certbot/certs/:/var/certs
+        - ./nginx/ssl/:/var/certs
         - ./certbot/letsencrypt/:/var/www/letsencrypt
       environment:
-        - CN="fake.domain.com"
-        - EMAIL="fake.email@gmail.com"
+        - CN=iosclub.tw
+        - EMAIL=fcu.iosclub@gmail.com
       networks:
         - frontend
 
