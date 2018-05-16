@@ -102,6 +102,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### PHP-FPM ##############################################
     php-fpm:
@@ -145,6 +146,7 @@ services:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
       networks:
         - backend
+      restart: always
 
 ### PHP Worker ############################################
     php-worker:
@@ -162,6 +164,7 @@ services:
         - "dockerhost:${DOCKER_HOST_IP}"
       networks:
         - backend
+      restart: always
 
 ### NGINX Server #########################################
     nginx:
@@ -182,6 +185,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### Blackfire ########################################
     blackfire:
@@ -215,6 +219,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### HHVM #################################################
     hhvm:
@@ -263,6 +268,7 @@ services:
         - "${MYSQL_PORT}:3306"
       networks:
         - backend
+      restart: always
 
 ### Percona ################################################
     percona:
@@ -362,6 +368,7 @@ services:
         - ${DATA_PATH_HOST}/mongo:/data/db
       networks:
         - backend
+      restart: always
 
 ### RethinkDB ##############################################
     rethinkdb:
@@ -382,6 +389,7 @@ services:
         - "${REDIS_PORT}:6379"
       networks:
         - backend
+      restart: always
 
 ### Aerospike ##########################################
     aerospike:
@@ -408,6 +416,7 @@ services:
         - php-fpm
       networks:
         - backend
+      restart: always
 
 ### Beanstalkd ###########################################
     beanstalkd:
@@ -462,6 +471,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### phpMyAdmin ###########################################
     phpmyadmin:
@@ -478,6 +488,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### Adminer ###########################################
     adminer:
@@ -492,6 +503,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### pgAdmin ##############################################
     pgadmin:
@@ -645,6 +657,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
 
 ### Grafana ################################################
     grafana:
@@ -670,6 +683,7 @@ services:
       networks:
         - frontend
         - backend
+      restart: always
         
 ### Solr ################################################
     solr:
