@@ -725,3 +725,4 @@ services:
         - 9010:9000
       networks:
         - backend
+      restart: always
