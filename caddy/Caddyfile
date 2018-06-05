@@ -1,39 +1,5 @@
 # Docs: https://caddyserver.com/docs/caddyfile
-https://iosclub.steamos.ahkui.com { 
-    root /var/www/iosclub/public
-    fastcgi / php-fpm:9000 php {
-        index index.php
-    }
-
-    # To handle .html extensions with laravel change ext to
-    # ext / .html
-
-    rewrite {
-        to {path} {path}/ /index.php?{query}
-    }
-    gzip
-    browse
-    log /var/log/caddy/access.log
-    errors /var/log/caddy/error.log
-    # Uncomment to enable TLS (HTTPS)
-    # Change the first list to listen on port 443 when enabling TLS
-    tls ahkui@outlook.com
-
-    # To use Lets encrpt tls with a DNS provider uncomment these
-    # lines and change the provider as required
-    #tls {
-    #  dns cloudflare
-    #}
-    git {
-        repo https://github.com/FCUiOSClub2017/website.git
-        path /var/www/iosclub
-        interval 60
-        hook  webhook laradock
-        hook_type   generic
-    }
-}
-
-https://rtc.steamos.ahkui.com {
+rtc.fcu.edu.tw {
     root /var/www/RTC/public
     fastcgi / php-fpm:9000 php {
         index index.php
@@ -46,17 +12,9 @@ https://rtc.steamos.ahkui.com {
     log /var/log/caddy/access.log
     errors /var/log/caddy/error.log
     tls ahkui@outlook.com
-    git {
-        repo https://github.com/ahkui/rtc.git
-        path /var/www/RTC
-        interval 60
-        hook  webhook laradock
-        hook_type   generic
-    }
-
 }
 
-https://app2018.steamos.ahkui.com {
+rtc-2018.fcu.edu.tw {
     root /var/www/RTC-iOS-App-competition-2018/public
     fastcgi / php-fpm:9000 php {
         index index.php
@@ -69,24 +27,10 @@ https://app2018.steamos.ahkui.com {
     log /var/log/caddy/access.log
     errors /var/log/caddy/error.log
     tls ahkui@outlook.com
-    git {
-        repo https://github.com/ahkui/RTC-iOS-App-competition-2018.git
-        path /var/www/RTC-iOS-App-competition-2018
-        interval 60
-        hook  webhook laradock
-        hook_type   generic
-    }
-
 }
-https://app2017.steamos.ahkui.com {
-    # Create a Proxy and cors.
-    proxy / ahkui.com:2017
-    git {
-        repo https://github.com/ahkui/RTC-iOS-App-competition-2017.git
-        path /var/www/RTC-iOS-App-competition-2017
-        interval 60
-        hook  webhook laradock
-        hook_type   generic
-    }
 
+rtc-2017.fcu.edu.tw {
+    # Create a Proxy and cors.
+    proxy / 140.134.131.121:2017
+    tls ahkui@outlook.com
 }
