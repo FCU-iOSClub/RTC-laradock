@@ -11,7 +11,7 @@ rtc.fcu.edu.tw {
     browse
     log /var/log/caddy/access.log
     errors /var/log/caddy/error.log
-    tls ahkui@outlook.com
+    #tls ahkui@outlook.com
 }
 
 rtc-2018.fcu.edu.tw {
@@ -26,11 +26,11 @@ rtc-2018.fcu.edu.tw {
     browse
     log /var/log/caddy/access.log
     errors /var/log/caddy/error.log
-    tls ahkui@outlook.com
+    #tls ahkui@outlook.com
 }
 
 rtc-2017.fcu.edu.tw {
     # Create a Proxy and cors.
     proxy / 140.134.131.121:2017
-    tls ahkui@outlook.com
+    #tls ahkui@outlook.com
 }
