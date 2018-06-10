@@ -726,3 +726,15 @@ services:
       networks:
         - backend
       restart: always
+      
+### NetData ################################################
+    netdata:
+      image: titpetric/netdata:latest
+      cap_add:
+      - SYS_PTRACE
+      volumes:
+      - /:/host:ro
+      ports:
+        - "${NETDATA_PORT}:19999"
+      networks:
+        - backend
