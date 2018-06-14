@@ -507,6 +507,8 @@ services:
         context: ./adminer
         args:
           - INSTALL_MSSQL=${ADM_INSTALL_MSSQL}
+      volumes:
+        - ./adminer/adminer.sql.gz:/var/www/html/adminer.sql.gz
       ports:
         - "${ADM_PORT}:8080"
       depends_on:
@@ -772,6 +774,7 @@ services:
         - "${GITLAB_HOST_SSH_PORT}:22"
       networks:
         - backend
+      restart: always
       depends_on:
         - redis
         - postgres
