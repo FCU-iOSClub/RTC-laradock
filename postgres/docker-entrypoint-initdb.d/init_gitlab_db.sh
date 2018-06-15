@@ -35,7 +35,7 @@ set -e
 
 ### default database and user for gitlab ##############################################
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE USER laradock_gitlab PASSWORD laradock_gitlab;
+    CREATE USER laradock_gitlab;
     CREATE DATABASE laradock_gitlab;
     GRANT ALL PRIVILEGES ON DATABASE laradock_gitlab TO laradock_gitlab;
 EOSQL
