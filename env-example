@@ -381,3 +381,6 @@ JUPYTERHUB_LOCAL_NOTEBOOK_IMAGE=laradock_jupyterhub-user
 JUPYTERHUB_CUSTOM_CONFIG=./jupyterhub/jupyterhub_config.py
 JUPYTERHUB_USER_DATA=~/jupyterhub
 JUPYTERHUB_USER_LIST=./jupyterhub/userlist
+
+### IPYTHON ##################################################
+LARADOCK_IPYTHON_CONTROLLER_IP=ipython-controller
