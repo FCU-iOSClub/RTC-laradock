@@ -61,6 +61,9 @@ services:
           - INSTALL_NODE=${WORKSPACE_INSTALL_NODE}
           - NPM_REGISTRY=${WORKSPACE_NPM_REGISTRY}
           - INSTALL_YARN=${WORKSPACE_INSTALL_YARN}
+          - INSTALL_NPM_GULP=${WORKSPACE_INSTALL_NPM_GULP}
+          - INSTALL_NPM_BOWER=${WORKSPACE_INSTALL_NPM_BOWER}
+          - INSTALL_NPM_VUE_CLI=${WORKSPACE_INSTALL_NPM_VUE_CLI}
           - INSTALL_DRUSH=${WORKSPACE_INSTALL_DRUSH}
           - INSTALL_DRUPAL_CONSOLE=${WORKSPACE_INSTALL_DRUPAL_CONSOLE}
           - INSTALL_AEROSPIKE=${WORKSPACE_INSTALL_AEROSPIKE}
@@ -731,6 +734,8 @@ services:
       volumes:
         - ${DATA_PATH_HOST}/portainer_data:/data
         - /var/run/docker.sock:/var/run/docker.sock
+      extra_hosts:
+        - "dockerhost:${DOCKER_HOST_IP}"
       ports:
         - 9010:9000
       networks:
@@ -827,3 +832,23 @@ services:
         context: ./jupyterhub
         dockerfile: Dockerfile.user
       command: ["sh", "-c", "echo \"build only\""]
+
+### IPython #########################################
+    ipython-controller:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.controller
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+      ports:
+        - "33327-33338:33327-33338"
+    ipython-engine:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.engine
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
