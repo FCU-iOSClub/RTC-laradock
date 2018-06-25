@@ -384,4 +384,4 @@ JUPYTERHUB_USER_DATA=~/jupyterhub
 JUPYTERHUB_USER_LIST=./jupyterhub/userlist
 
 ### IPYTHON ##################################################
-LARADOCK_IPYTHON_CONTROLLER_IP=ipython-controller
+LARADOCK_IPYTHON_CONTROLLER_IP=127.0.0.1
