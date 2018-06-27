@@ -18,8 +18,12 @@ FROM laradock/php-fpm:2.2-${PHP_VERSION}
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
+# Set Environment Variables
+ENV DEBIAN_FRONTEND noninteractive
+
 # always run apt update when start and after add new source list, then clean up at end.
 RUN apt-get update -yqq && \
+    apt-get install -y apt-utils && \
     pecl channel-update pecl.php.net
 
 #
@@ -188,6 +192,8 @@ RUN if [ ${INSTALL_AMQP} = true ]; then \
 ARG INSTALL_ZIP_ARCHIVE=false
 
 RUN if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
+    apt-get install libzip-dev -y && \
+    docker-php-ext-configure zip --with-libzip && \
     # Install the zip extension
     docker-php-ext-install zip \
 ;fi
@@ -197,7 +203,7 @@ RUN if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
 ###########################################################################
 
 ARG INSTALL_PCNTL=false
-RUN if [ ${INSTALL_PCNTL} = true]; then \
+RUN if [ ${INSTALL_PCNTL} = true ]; then \
     # Installs pcntl, helpful for running Horizon
     docker-php-ext-install pcntl \
 ;fi
