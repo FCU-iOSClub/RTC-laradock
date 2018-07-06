@@ -564,7 +564,6 @@ services:
         - frontend
         - backend
 
-
 ### Kibana ##############################################
     kibana:
       build: ./kibana
@@ -867,10 +866,6 @@ services:
       build:
         context: ./ipython
         dockerfile: Dockerfile.engine
-      networks:
-        - backend
-      extra_hosts:
-        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
 
 ### PHPRedisAdmin ################################################
     phpredisadmin:
