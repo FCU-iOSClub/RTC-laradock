@@ -564,7 +564,6 @@ services:
         - frontend
         - backend
 
-
 ### Kibana ##############################################
     kibana:
       build: ./kibana
@@ -748,6 +747,26 @@ services:
         - backend
       restart: always
       
+### IPython #########################################
+    ipython-controller:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.controller
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+      ports:
+        - "33327-33338:33327-33338"
+    ipython-engine:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.engine
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+
 ### Docker-in-Docker ################################################
     docker-in-docker:
       image: docker:dind
@@ -867,10 +886,6 @@ services:
       build:
         context: ./ipython
         dockerfile: Dockerfile.engine
-      networks:
-        - backend
-      extra_hosts:
-        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
 
 ### PHPRedisAdmin ################################################
     phpredisadmin:
