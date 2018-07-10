@@ -904,3 +904,15 @@ services:
       depends_on:
         - mongo
       restart: always
+
+### IDE ################################################
+    ide:
+      build:
+        context: ./ide
+      volumes:
+        - ${APP_CODE_PATH_HOST}:/home/project
+      ports:
+        - "${IDE_PORT}:3000"
+      networks:
+        - backend
+      restart: always
