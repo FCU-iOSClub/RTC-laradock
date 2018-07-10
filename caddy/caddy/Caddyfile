@@ -34,3 +34,8 @@ rtc-2017.fcu.edu.tw {
     proxy / 140.134.131.121:2017
     #tls ahkui@outlook.com
 }
+
+laradock3.demo:80 {
+    import authlist.conf
+    root /var/www/public
+}
