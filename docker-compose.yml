@@ -776,12 +776,12 @@ services:
         - mongo
 
 ### IDE ################################################
-    ide:
+    ide-theia:
       build:
-        context: ./ide
+        context: ./ide-theia
       volumes:
         - ${APP_CODE_PATH_HOST}:/home/project
       ports:
-        - "${IDE_PORT}:3000"
+        - "${IDE_THEIA_PORT}:3000"
       networks:
         - backend
