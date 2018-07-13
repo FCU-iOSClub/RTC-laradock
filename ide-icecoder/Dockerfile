@@ -6,17 +6,16 @@ ARG PUID=1000
 ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
-ARG DOCUMENT_ROOT=/var/www
-ENV DOCUMENT_ROOT ${DOCUMENT_ROOT}/
+
+RUN addgroup -g $PGID -S laradock && \
+    adduser -u $PUID -S laradock -G laradock
+
+USER laradock
 
 RUN apk add --no-cache git
 
-RUN cd /root && git clone https://github.com/mattpass/ICEcoder.git
+RUN cd /home/laradock && git clone https://github.com/mattpass/ICEcoder.git
 
-RUN mkdir /var/www
-
-RUN php -r '$str=file_get_contents("/root/ICEcoder/lib/settings-system-params.php");print($str);$str=str_replace("docRoot", "docRoot\"=> "/var/www/", //",$str);file_put_contents("/root/ICEcoder/lib/settings-system-params.php", $str);'
-
-WORKDIR /root/ICEcoder
+WORKDIR /home/laradock/ICEcoder
 
 CMD ["php","-S","0.0.0.0:80"]
