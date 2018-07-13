@@ -1,11 +1,11 @@
-FROM zuohuadong/caddy:alpine
+FROM php:alpine
 
 LABEL maintainer="ahkui <ahkui@outlook.com>"
+
+RUN apk add --no-cache git
 
 RUN cd /var/www && git clone https://github.com/mattpass/ICEcoder.git
 
 WORKDIR /var/www/ICEcoder
 
-RUN echo -e '0.0.0.0:80 {\n    root /var/www/ICEcoder\n    fastcgi / php-fpm:9000 php {\n        index index.php\n    }\n    rewrite {\n        to {path} {path}/ /index.php?{query}\n    }\n}' >> /root/Caddyfile
-
-CMD ["/usr/bin/caddy", "-agree","-conf","/root/Caddyfile"]
+CMD ["php","-S","0.0.0.0:80"]
