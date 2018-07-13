@@ -18,4 +18,4 @@ RUN cd /home/laradock && git clone https://github.com/mattpass/ICEcoder.git
 
 WORKDIR /home/laradock/ICEcoder
 
-CMD ["php","-S","0.0.0.0:80"]
+CMD ["php","-S","0.0.0.0:8080"]
