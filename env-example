@@ -378,3 +378,6 @@ MONGO_WEBUI_INSTALL_MONGO=false
 
 ### IDE ###############################################
 IDE_THEIA_PORT=987
+IDE_WEBIDE_PORT=984
+IDE_CODIAD_PORT=985
+IDE_ICECODER_PORT=986
