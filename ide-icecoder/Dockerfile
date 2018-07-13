@@ -13,7 +13,7 @@ RUN apk add --no-cache git
 
 RUN cd /root && git clone https://github.com/mattpass/ICEcoder.git
 
-RUN sed -i "s/\$_SERVER['DOCUMENT_ROOT']/getenv('DOCUMENT_ROOT',\$_SERVER['DOCUMENT_ROOT'])/g" /root/ICEcoder/lib/config___settings.php
+RUN sed -i "s/\$_SERVER[\'DOCUMENT_ROOT\']/getenv(\'DOCUMENT_ROOT\',\$_SERVER[\'DOCUMENT_ROOT\'])/g" /root/ICEcoder/lib/settings-system-params.php
 
 WORKDIR /root/ICEcoder
 
