@@ -6,4 +6,6 @@ RUN cd /root && git clone https://github.com/mattpass/ICEcoder.git
 
 WORKDIR /root/ICEcoder
 
-CMD ["/usr/bin/caddy", "-agree","-host","0.0.0.0"]
+RUN echo -e '0.0.0.0:80 {\n\troot /root/ICEcoder\n\tfastcgi / php-fpm:9000 php {\n\t\tindex index.php\n\t}\n}' >> /root/Caddyfile
+
+CMD ["/usr/bin/caddy", "-agree","-conf","/root/Caddyfile"]
