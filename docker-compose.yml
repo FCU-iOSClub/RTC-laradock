@@ -961,7 +961,7 @@ services:
         - /etc/localtime:/etc/localtime:ro
         - ${APP_CODE_PATH_HOST}:/home/laradock/ICEcoder/dev
       ports:
-        - "${IDE_ICECODER_PORT}:80"
+        - "${IDE_ICECODER_PORT}:8080"
       networks:
         - backend
       restart: always
