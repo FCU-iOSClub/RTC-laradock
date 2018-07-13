@@ -7,12 +7,12 @@ ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
 
+RUN apk add --no-cache git
+
 RUN addgroup -g $PGID -S laradock && \
     adduser -u $PUID -S laradock -G laradock
 
 USER laradock
-
-RUN apk add --no-cache git
 
 RUN cd /home/laradock && git clone https://github.com/mattpass/ICEcoder.git
 
