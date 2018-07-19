@@ -50,6 +50,7 @@ services:
           - PHP_VERSION=${PHP_VERSION}
           - INSTALL_SUBVERSION=${WORKSPACE_INSTALL_SUBVERSION}
           - INSTALL_XDEBUG=${WORKSPACE_INSTALL_XDEBUG}
+          - INSTALL_PHPDBG=${WORKSPACE_INSTALL_PHPDBG}
           - INSTALL_BLACKFIRE=${INSTALL_BLACKFIRE}
           - INSTALL_SOAP=${WORKSPACE_INSTALL_SOAP}
           - INSTALL_LDAP=${WORKSPACE_INSTALL_LDAP}
@@ -86,6 +87,7 @@ services:
           - INSTALL_DUSK_DEPS=${WORKSPACE_INSTALL_DUSK_DEPS}
           - INSTALL_PG_CLIENT=${WORKSPACE_INSTALL_PG_CLIENT}
           - INSTALL_SWOOLE=${WORKSPACE_INSTALL_SWOOLE}
+          - INSTALL_LIBPNG=${WORKSPACE_INSTALL_LIBPNG}
           - PUID=${WORKSPACE_PUID}
           - PGID=${WORKSPACE_PGID}
           - CHROME_DRIVER_VERSION=${WORKSPACE_CHROME_DRIVER_VERSION}
@@ -116,6 +118,7 @@ services:
         args:
           - PHP_VERSION=${PHP_VERSION}
           - INSTALL_XDEBUG=${PHP_FPM_INSTALL_XDEBUG}
+          - INSTALL_PHPDBG=${PHP_FPM_INSTALL_PHPDBG}
           - INSTALL_BLACKFIRE=${INSTALL_BLACKFIRE}
           - INSTALL_SOAP=${PHP_FPM_INSTALL_SOAP}
           - INSTALL_IMAP=${PHP_FPM_INSTALL_IMAP}
@@ -141,6 +144,7 @@ services:
           - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
           - INSTALL_IMAGE_OPTIMIZERS=${PHP_FPM_INSTALL_IMAGE_OPTIMIZERS}
           - INSTALL_IMAGEMAGICK=${PHP_FPM_INSTALL_IMAGEMAGICK}
+          - INSTALL_CALENDAR=${PHP_FPM_INSTALL_CALENDAR}
       volumes:
         - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
@@ -150,11 +154,14 @@ services:
         - "dockerhost:${DOCKER_HOST_IP}"
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
+        - DOCKER_HOST=tcp://docker-in-docker:2375
       depends_on:
         - workspace
       networks:
         - backend
       restart: always
+      links:
+        - docker-in-docker
 
 ### PHP Worker ############################################
     php-worker:
@@ -475,7 +482,7 @@ services:
       build: ./caddy
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-        - ${CADDY_CUSTOM_CADDYFILE}:/etc/Caddyfile
+        - ${CADDY_CONFIG_PATH}:/etc/caddy
         - ${CADDY_HOST_LOG_PATH}:/var/log/caddy
         - ${DATA_PATH_HOST}:/root/.caddy
       ports:
@@ -536,7 +543,6 @@ services:
         - backend
       restart: always
 
-
 ### ElasticSearch ########################################
     elasticsearch:
       build: ./elasticsearch
@@ -558,7 +564,6 @@ services:
       networks:
         - frontend
         - backend
-
 
 ### Kibana ##############################################
     kibana:
@@ -613,6 +618,7 @@ services:
         - /dev/shm:/dev/shm
       networks:
         - frontend
+      restart: always
 
 ### Varnish ##########################################
     proxy:
@@ -742,6 +748,73 @@ services:
         - backend
       restart: always
       
+### JupyterHub #########################################
+    jupyterhub:
+      build:
+        context: ./jupyterhub
+      depends_on:
+        - postgres
+        - jupyterhub-user
+      restart: always
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock:rw
+        - ${DATA_PATH_HOST}/jupyterhub/:/data
+        - ${JUPYTERHUB_CUSTOM_CONFIG}:/jupyterhub_config.py
+        - ${JUPYTERHUB_USER_DATA}:/user-data
+        - ${JUPYTERHUB_USER_LIST}:/userlist
+      networks:
+        - backend
+      ports:
+        - "${JUPYTERHUB_PORT}:80"
+      environment:
+        - TERM=xterm
+        - JUPYTERHUB_USER_DATA=${JUPYTERHUB_USER_DATA}
+        - JUPYTERHUB_POSTGRES_DB=${JUPYTERHUB_POSTGRES_DB}
+        - JUPYTERHUB_POSTGRES_USER=${JUPYTERHUB_POSTGRES_USER}
+        - JUPYTERHUB_POSTGRES_HOST=${JUPYTERHUB_POSTGRES_HOST}
+        - JUPYTERHUB_POSTGRES_PASSWORD=${JUPYTERHUB_POSTGRES_PASSWORD}
+        - JUPYTERHUB_OAUTH_CALLBACK_URL=${JUPYTERHUB_OAUTH_CALLBACK_URL}
+        - JUPYTERHUB_OAUTH_CLIENT_ID=${JUPYTERHUB_OAUTH_CLIENT_ID}
+        - JUPYTERHUB_OAUTH_CLIENT_SECRET=${JUPYTERHUB_OAUTH_CLIENT_SECRET}
+        - JUPYTERHUB_LOCAL_NOTEBOOK_IMAGE=${JUPYTERHUB_LOCAL_NOTEBOOK_IMAGE}
+    jupyterhub-user:
+      build:
+        context: ./jupyterhub
+        dockerfile: Dockerfile.user
+      command: ["sh", "-c", "echo \"build only\""]
+
+### IPython #########################################
+    ipython-controller:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.controller
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+      ports:
+        - "33327-33338:33327-33338"
+    ipython-engine:
+      build:
+        context: ./ipython
+        dockerfile: Dockerfile.engine
+      networks:
+        - backend
+      extra_hosts:
+        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+
+### Docker-in-Docker ################################################
+    docker-in-docker:
+      image: docker:dind
+      privileged: true
+      volumes:
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      expose:
+        - 2375
+      networks:
+        - backend
+      restart: always
+
 ### NetData ################################################
     netdata:
       image: titpetric/netdata:latest
@@ -798,57 +871,98 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock:rw
       restart: always
 
-### JupyterHub #########################################
-    jupyterhub:
-      build:
-        context: ./jupyterhub
-      depends_on:
-        - postgres
-        - jupyterhub-user
-      restart: always
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock:rw
-        - ${DATA_PATH_HOST}/jupyterhub/:/data
-        - ${JUPYTERHUB_CUSTOM_CONFIG}:/jupyterhub_config.py
-        - ${JUPYTERHUB_USER_DATA}:/user-data
-        - ${JUPYTERHUB_USER_LIST}:/userlist
-      networks:
-        - backend
-      ports:
-        - "${JUPYTERHUB_PORT}:80"
+### PHPRedisAdmin ################################################
+    phpredisadmin:
+      image: erikdubbelboer/phpredisadmin:latest
       environment:
-        - TERM=xterm
-        - JUPYTERHUB_USER_DATA=${JUPYTERHUB_USER_DATA}
-        - JUPYTERHUB_POSTGRES_DB=${JUPYTERHUB_POSTGRES_DB}
-        - JUPYTERHUB_POSTGRES_USER=${JUPYTERHUB_POSTGRES_USER}
-        - JUPYTERHUB_POSTGRES_HOST=${JUPYTERHUB_POSTGRES_HOST}
-        - JUPYTERHUB_POSTGRES_PASSWORD=${JUPYTERHUB_POSTGRES_PASSWORD}
-        - JUPYTERHUB_OAUTH_CALLBACK_URL=${JUPYTERHUB_OAUTH_CALLBACK_URL}
-        - JUPYTERHUB_OAUTH_CLIENT_ID=${JUPYTERHUB_OAUTH_CLIENT_ID}
-        - JUPYTERHUB_OAUTH_CLIENT_SECRET=${JUPYTERHUB_OAUTH_CLIENT_SECRET}
-        - JUPYTERHUB_LOCAL_NOTEBOOK_IMAGE=${JUPYTERHUB_LOCAL_NOTEBOOK_IMAGE}
-    jupyterhub-user:
-      build:
-        context: ./jupyterhub
-        dockerfile: Dockerfile.user
-      command: ["sh", "-c", "echo \"build only\""]
-
-### IPython #########################################
-    ipython-controller:
-      build:
-        context: ./ipython
-        dockerfile: Dockerfile.controller
+        - ADMIN_USER=${REDIS_WEBUI_USERNAME}
+        - ADMIN_PASS=${REDIS_WEBUI_PASSWORD}
+        - REDIS_1_HOST=${REDIS_WEBUI_CONNECT_HOST}
+        - REDIS_1_PORT=${REDIS_WEBUI_CONNECT_PORT}
       networks:
         - backend
-      extra_hosts:
-        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
       ports:
-        - "33327-33338:33327-33338"
-    ipython-engine:
+        - "${REDIS_WEBUI_PORT}:80"
+      restart: always
+      depends_on:
+        - redis
+
+### MongoWebUI ################################################
+    mongo-webui:
       build:
-        context: ./ipython
-        dockerfile: Dockerfile.engine
+        context: ./mongo-webui
+      restart: always
+      environment:
+        - ROOT_URL=${MONGO_WEBUI_ROOT_URL}
+        - MONGO_URL=${MONGO_WEBUI_MONGO_URL}
+        - INSTALL_MONGO=${MONGO_WEBUI_INSTALL_MONGO}
+      volumes:
+        - ${DATA_PATH_HOST}/mongo-webui:/data/db
+      ports:
+        - "${MONGO_WEBUI_PORT}:3000"
       networks:
         - backend
-      extra_hosts:
-        - "laradock-ipython:${LARADOCK_IPYTHON_CONTROLLER_IP}"
+      depends_on:
+        - mongo
+      restart: always
+
+### IDE-THEIA ################################################
+    ide-theia:
+      build:
+        context: ./ide-theia
+      volumes:
+        - ${APP_CODE_PATH_HOST}:/home/project
+      ports:
+        - "${IDE_THEIA_PORT}:3000"
+      networks:
+        - backend
+      restart: always
+
+### IDE-WEBIDE ################################################
+    ide-webide:
+      build:
+        context: ./ide-webide
+      volumes:
+        - ${DATA_PATH_HOST}/ide/webide/ide.db:/root/.coding-ide/ide.db
+      ports:
+        - "${IDE_WEBIDE_PORT}:8080"
+      networks:
+        - backend
+      restart: always
+
+### IDE-CODIAD ################################################
+    ide-codiad:
+      build:
+        context: ./ide-codiad
+      environment:
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+        - TZ=${WORKSPACE_TIMEZONE}
+        - PGID=1000
+        - PUID=1000
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+        - ${DATA_PATH_HOST}/ide/codiad:/config
+      ports:
+        - "${IDE_CODIAD_PORT}:80"
+      networks:
+        - backend
+      restart: always
+
+### IDE-ICECODER ################################################
+    ide-icecoder:
+      build:
+        context: ./ide-icecoder
+      environment:
+        - DOCUMENT_ROOT=${APP_CODE_PATH_CONTAINER}
+        - TZ=${WORKSPACE_TIMEZONE}
+        - PGID=1000
+        - PUID=1000
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - ${APP_CODE_PATH_HOST}:/home/laradock/ICEcoder/dev
+      ports:
+        - "${IDE_ICECODER_PORT}:8080"
+      networks:
+        - backend
+      restart: always
