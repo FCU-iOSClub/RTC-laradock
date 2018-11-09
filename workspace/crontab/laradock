@@ -1,1 +1,4 @@
-* * * * * laradock /usr/bin/php /var/www/artisan schedule:run >> /dev/null 2>&1
+* * * * * laradock /usr/bin/php /var/www/rtc/artisan schedule:run >> /dev/null 2>&1
+* * * * * laradock /usr/bin/php /var/www/app2018/artisan schedule:run >> /dev/null 2>&1
+* * * * * laradock /usr/bin/php /var/www/iosclub/artisan schedule:run >> /dev/null 2>&1
+* * * * * laradock /usr/local/bin/composer install -d /var/www/app2018 >> /dev/null 2>&1
