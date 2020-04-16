@@ -1,3 +1,4 @@
-*
-!.gitignore
-
+*.crt
+*.csr
+*.key
+*.pem
